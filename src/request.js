@@ -29,6 +29,11 @@ const isRequest = object => {
 };
 
 /**
+ * List of headers that are forbidden by the spec.
+ */
+const FORBIDDEN_HEADERS = ["Accept-Charset", "Accept-Encoding", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Connection", "Content-Length", "Cookie", "Cookie2", "Date", "DNT", "Expect", "Host", "Keep-Alive", "Origin", "Referer", "TE", "Trailer", "Transfer-Encoding", "Upgrade", "Via"];
+
+/**
  * Request class
  *
  * Ref: https://fetch.spec.whatwg.org/#request-class
@@ -73,6 +78,16 @@ export default class Request extends Body {
 		});
 
 		const headers = new Headers(init.headers || input.headers || {});
+
+		// Block forbidden headers
+		for (const header of FORBIDDEN_HEADERS) {
+			headers.delete(header);
+		}
+		for (const header of headers.keys()) {
+			if (header.startsWith("sec-") || header.startsWith("proxy-")) {
+				headers.delete(header);
+			}
+		}
 
 		if (inputBody !== null && !headers.has('Content-Type')) {
 			const contentType = extractContentType(inputBody, this);

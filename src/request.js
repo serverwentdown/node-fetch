@@ -196,6 +196,9 @@ export const getNodeRequestOptions = request => {
 			contentLengthValue = String(totalBytes);
 		}
 	}
+	if (contentLengthValue === null && body.size !== 0) {
+		contentLengthValue = String(body.size);
+	}
 
 	if (contentLengthValue) {
 		headers.set('Content-Length', contentLengthValue);
